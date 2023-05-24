@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mersenne Sequence Generator</title>
+    <style>
+        .loader {
+            border: 16px solid #f3f3f3;
+            border-top: 16px solid #3498db;
+            border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        function generateSequence() {
+            var n = document.getElementById("inputNumber").value;
+            var outputSection = document.getElementById("outputSection");
+            outputSection.innerHTML = "";  // Clear previous output
+
+            // Display loading spinner
+            var loader = document.createElement("div");
+            loader.className = "loader";
+            outputSection.appendChild(loader);
+
+            // Perform calculation
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        outputSection.removeChild(loader);
+                        var sequence = JSON.parse(xhr.responseText);
+                        for (var i = 0; i < sequence.length; i++) {
+                            var number = sequence[i];
+                            var output = document.createElement("p");
+                            output.textContent = number;
+                            outputSection.appendChild(output);
+                        }
+                    } else {
+                        outputSection.removeChild(loader);
+                        var error = document.createElement("p");
+                        error.textContent = "An error occurred while generating the sequence.";
+                        outputSection.appendChild(error);
+                    }
+                }
+            };
+            xhr.open("POST", "mersenne_sequence_generator.php", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("n=" + n);
+        }
+    </script>
+</head>
+<body>
+    <h1>Mersenne Sequence Generator</h1>
+    <label for="inputNumber">Enter the number of Mersenne primes to generate:</label>
+    <input type="number" id="inputNumber" min="1" required>
+    <button onclick="generateSequence()">Start Calculation</button>
+    <div id="outputSection"></div>
+</body>
+</html>
